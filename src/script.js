@@ -1,88 +1,49 @@
-// Get the display element
-const display = document.getElementById('calc-display');
+document.addEventListener("DOMContentLoaded", function () {
+    console.log("document is ready");
+    const display = document.getElementById('calc-display');
+    const buttons = document.getElementsByClassName('btn');
 
-// Initialize the current expression and the last result
-let currentExpression = '';
-let lastResult = '';
+    let currentValue = "";
 
-// Function to update the display
-function updateDisplay() {
-    display.value = currentExpression;
-}
-
-// Function to evaluate expression safely
-function evaluateExpression(expression) {
-    try {
-        // Convert log and ln to correct JavaScript functions
-        let processedExpression = expression
-            .replace(/log\(/g, 'Math.log10(') // Convert log to base-10
-            .replace(/ln\(/g, 'Math.log('); // Convert ln to natural log
-
-        const result = eval(processedExpression);
-        return result;
-    } catch (error) {
-        return 'Error';
+    function evaluateResult() {
+        console.log('currentValue:', currentValue)
+        const convertedValue = currentValue
+            .replace("×", "*")
+            .replace("÷", "/")
+            .replace("%", '*0.01')
+            .replace('sin', 'Math.sin')
+            .replace('cos', 'Math.cos')
+            .replace('tan', 'Math.tan')
+            .replace('ln', 'Math.log')
+            .replace('π', 'Math.PI');
+        console.log('currentValue:', convertedValue)
+        const result = eval(convertedValue);
+        currentValue = result.toString();
+        display.value = currentValue;
     }
-}
 
-// Function to handle button clicks
-function handleButtonClick(event) {
-    const buttonValue = event.target.textContent;
+    for (let i = 0; i < buttons.length; i++) {
+        const button = buttons[i];
+        button.addEventListener('click', function () {
+            const value = button.innerText;
 
-    // Handle special buttons
-    if (buttonValue === 'AC') {
-        currentExpression = '';
-        lastResult = '';
-        updateDisplay();
-    } else if (buttonValue === '⌫') {
-        currentExpression = currentExpression.slice(0, -1);
-        updateDisplay();
-    } else if (buttonValue === '=') {
-        const result = evaluateExpression(currentExpression);
-        lastResult = result;
-        currentExpression = result.toString();
-        updateDisplay();
-    } else if (buttonValue === 'Ans') {
-        currentExpression += lastResult;
-        updateDisplay();
-    } else if (buttonValue === 'π') {
-        currentExpression += Math.PI;
-        updateDisplay();
-    } else if (buttonValue === 'e') {
-        currentExpression += Math.E;
-        updateDisplay();
-    } else if (buttonValue === 'log') {
-        currentExpression += 'log(';
-        updateDisplay();
-    } else if (buttonValue === 'ln') {
-        currentExpression += 'ln(';
-        updateDisplay();
-    } else if (buttonValue === 'sin') {
-        currentExpression += 'Math.sin(';
-        updateDisplay();
-    } else if (buttonValue === 'cos') {
-        currentExpression += 'Math.cos(';
-        updateDisplay();
-    } else if (buttonValue === 'tan') {
-        currentExpression += 'Math.tan(';
-        updateDisplay();
-    } else if (buttonValue === 'xⁿ') {
-        currentExpression += '**';
-        updateDisplay();
-    } else if (buttonValue === '√') {
-        currentExpression += 'Math.sqrt(';
-        updateDisplay();
-    } else if (buttonValue === '|x|') {
-        currentExpression += 'Math.abs(';
-        updateDisplay();
-    } else {
-        currentExpression += buttonValue;
-        updateDisplay();
+            // Logic OF AC:- 
+            try {
+                if (value == "AC") {
+                    currentValue = "";
+                    display.value = currentValue;
+                } else if (value == "=") {
+                    evaluateResult();
+                } else {
+                    currentValue += value;
+                    display.value = currentValue;
+                }
+            } catch (error) {
+                console.error(error);
+                currentValue = "ERROR";
+                display.value = currentValue
+            }
+        })
+
     }
-}
-
-// Add event listeners to all buttons
-const buttons = document.querySelectorAll('button');
-buttons.forEach(button => {
-    button.addEventListener('click', handleButtonClick);
 });
